@@ -7,10 +7,10 @@
     "tl_margin": 0.539,
     "miner": true,
     "miner_margin": 0.734,
-    "learning_rate": 5.945e-05,
+    "learning_rate": 0.0001,
     "optimizer": "Adam",
     "weight_decay": 0,
-    "batchsize": 35,
+    "batchsize": 70,
     "patience": 50,
     "aug_train_shift_distance": 2
   },
