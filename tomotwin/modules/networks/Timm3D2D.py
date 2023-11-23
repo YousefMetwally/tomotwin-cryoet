@@ -10,13 +10,16 @@ class Timm2D3D(TorchModel):
     class Model(nn.Module):
         def __init__(
                 self,
-                modelname: str
+                modelname: str,
+                norm: nn.Module,
         ):
             super().__init__()
             self.model = timm.create_model(modelname, pretrained=False)
-            self.conv_3d = nn.Conv3d(1, 1, 3)
-            self.pool = nn.AdaptiveAvgPool3d((144))
-            self.conv2d = nn.Conv2d(144, 3, 3)
+            self.conv_3d_1 = nn.Conv3d(1, 64, 3)
+            self.conv_3d_2 = nn.Conv3d(64, 1, 3)
+            self.norm = nn.GroupNorm(num_channels=64, num_groups=64)
+            self.pool = nn.AdaptiveAvgPool3d((64))
+            self.conv2d = nn.Conv2d(64, 3, 3)
             self.headnet = self._make_headnet(
                 1000, 2048, 32, dropout=0
             )
@@ -43,7 +46,10 @@ class Timm2D3D(TorchModel):
             # print("Shape input", inputtensor.shape)
             inputtensor = F.pad(inputtensor, (1, 2, 1, 2, 1, 2))
             # print("Shape input pad", inputtensor.shape)
-            x = self.conv_3d(inputtensor)
+            x = self.conv_3d_1(inputtensor)
+            if self.norm is not None:
+                x = self.norm(x)
+            x = self.conv_3d_2(x)
             # print("x after conv3d", x.shape)
             x = x.squeeze(1)
             # print("x after squeeze", x.shape)
@@ -54,7 +60,7 @@ class Timm2D3D(TorchModel):
             x = self.model(x)
             # print("out model", x.shape)
             x = x.reshape(x.size(0), -1)  # flatten
-            # print("reshape size", x.shape)
+            #print("reshape size", x.shape)
             x = self.headnet(x)
             # print("headnet size", x.shape)
             return x
@@ -62,7 +68,8 @@ class Timm2D3D(TorchModel):
     def __init__(
             self,
     ):
-        self.model = self.Model('efficientnet_b3')
+        self.model = self.Model('efficientnet_b3',
+                                norm=nn.GroupNorm)
 
     def init_weights(self):
         def _init_weights(model):

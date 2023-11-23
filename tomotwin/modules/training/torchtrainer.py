@@ -507,7 +507,7 @@ class TorchTrainer(Trainer):
             shuffle=True,
             num_workers=self.workers,
             pin_memory=False,
-            # prefetch_factor=5,
+            prefetch_factor=5,
             timeout=180,
         )
 
@@ -519,7 +519,7 @@ class TorchTrainer(Trainer):
                 shuffle=True,
                 num_workers=self.workers,
                 pin_memory=False,
-                # prefetch_factor=5,
+                prefetch_factor=5,
                 timeout=60,
             )
         return train_loader, test_loader
