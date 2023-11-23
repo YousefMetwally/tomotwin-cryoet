@@ -466,7 +466,7 @@ class TorchTrainer(Trainer):
 
         # Write graph to tensorboard
         dummy_input = torch.zeros([12, 1, 37, 37, 37])
-        self.writer.add_graph(self.model, dummy_input)
+        # self.writer.add_graph(self.model, dummy_input)
 
         self.model = self.model.to(self.device)
         self.optimizer = getattr(optim, optimizer)(

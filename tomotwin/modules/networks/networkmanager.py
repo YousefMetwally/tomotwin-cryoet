@@ -379,6 +379,7 @@ import json
 from typing import Dict
 
 from tomotwin.modules.networks.SiameseNet3D import SiameseNet3D
+from tomotwin.modules.networks.Timm3D2D import Timm2D3D
 from tomotwin.modules.networks.resnet import Resnet
 from tomotwin.modules.networks.torchmodel import TorchModel
 
@@ -398,6 +399,7 @@ class NetworkManager:
     network_identifier_map = {
         "SiameseNet".upper(): SiameseNet3D,
         "ResNet".upper(): Resnet,
+        "Timm2D3D".upper(): Timm2D3D,
     }
 
 
