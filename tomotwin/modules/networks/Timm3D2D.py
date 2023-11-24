@@ -17,14 +17,14 @@ class Timm2D3D(TorchModel):
             self.model = timm.create_model(modelname, pretrained=True)
             self.conv_3d_1 = nn.Conv3d(1, 64, 3)
             self.conv_3d_2 = nn.Conv3d(64, 64, 3)
-            self.conv_3d_3 = nn.Conv3d(64, 32, 3)
+            self.conv_3d_3 = nn.Conv3d(64, 1, 3)
             self.conv_3d_4 = nn.Conv3d(32, 1, 3)
             self.max_pooling = nn.MaxPool3d((2, 2, 2))
             self.relu = nn.LeakyReLU()
             self.norm_1_2 = nn.GroupNorm(num_channels=64, num_groups=64)
             self.norm_2_3 = nn.GroupNorm(num_channels=64, num_groups=64)
             self.norm_3_4 = nn.GroupNorm(num_channels=32, num_groups=32)
-            self.pool = nn.AdaptiveAvgPool3d((32))
+            self.pool = nn.AdaptiveMaxPool3d((32))
             self.conv2d = nn.Conv2d(32, 3, 3)
             self.headnet = self._make_headnet(
                 1000, 2048, 32, dropout=0
@@ -57,15 +57,18 @@ class Timm2D3D(TorchModel):
                 x = self.norm_1_2(x)
                 x = self.relu(x)
             x = self.conv_3d_2(x)
-            x = self.max_pooling(x)
+
             if self.norm_2_3 is not None:
                 x = self.norm_2_3(x)
                 x = self.relu(x)
             x = self.conv_3d_3(x)
-            if self.norm_3_4 is not None:
-                x = self.norm_3_4(x)
-                x = self.relu(x)
-            x = self.conv_3d_4(x)
+            x = self.relu(x)
+            # x = self.max_pooling(x)
+            # x = self.conv_3d_3(x)
+            # if self.norm_3_4 is not None:
+            #    x = self.norm_3_4(x)
+            #    x = self.relu(x)
+            # x = self.conv_3d_4(x)
             # print("x after conv3d", x.shape)
             x = x.squeeze(1)
             # print("x after squeeze", x.shape)
@@ -84,7 +87,7 @@ class Timm2D3D(TorchModel):
     def __init__(
             self,
     ):
-        self.model = self.Model('efficientnet_b3',
+        self.model = self.Model('efficientnet_b0',
                                 norm=nn.GroupNorm)
 
     def init_weights(self):
